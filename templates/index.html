@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <title>Sales Prediction</title>
+</head>
+<body>
+    <div class="main">
+        <h1>Sales Prediction</h1>
+        <form onsubmit="event.preventDefault(); predictSales();">
+            <div>
+                <label for="tv">TV Ad Budget:</label>
+                <input type="number" id="tv" step="0.01" required>
+            </div>
+            <div>
+                <label for="radio">Radio Ad Budget:</label>
+                <input type="number" id="radio" step="0.01" required>
+            </div>
+    
+            <div>
+                <label for="newspaper">Newspaper Ad Budget:</label>
+                <input type="number" id="newspaper" step="0.01" required>
+            </div>
+    
+           <div class="btn">
+            <button type="submit">Predict Sales</button>
+           </div> 
+        </form>
+    </div>
+
+    <h2 id="result"></h2>
+</body>
+<script>
+    async function predictSales() {
+        const tvBudget = document.getElementById('tv').value;
+        const radioBudget = document.getElementById('radio').value;
+        const newspaperBudget = document.getElementById('newspaper').value;
+
+        if(tvBudget === 0.1 || !radioBudget === 0.1 || !newspaperBudget){
+            alert("Please enter some values")
+        }
+
+        const response = await fetch('http://127.0.0.1:5000/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                'TV Ad Budget': parseFloat(tvBudget),
+                'Radio Ad Budget': parseFloat(radioBudget),
+                'Newspaper Ad Budget': parseFloat(newspaperBudget)
+            })
+        });
+
+        const data = await response.json();
+        console.log(data)
+        document.getElementById('result').innerText = `Predicted Sales: ${data.predicted_sales.toFixed(2)}`;
+    }
+</script>
+</html>
